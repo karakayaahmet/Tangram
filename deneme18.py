@@ -4,27 +4,31 @@ import math
 
 pygame.init()
 
-screen_width = 1200
-screen_height = 600
+# Ekranı tam ekran modunda aç
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen_width, screen_height = screen.get_size()
 
-screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Kriptarium Tangram")
 
+# Renkler
 red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 light_blue = (173, 216, 230)
 yellow = (255, 255, 0)
 
+# Şekil boyutları ve ölçekleri
 shape_size = 80
-enlarged_scale = 1.5  # %50 büyüme
-enlarged_blue_scale = 1.25  # %25 büyüme
+enlarged_scale = 1.5
+enlarged_blue_scale = 1.25
 rotation_speed = 2
 
+# Diğer ölçümler
 tri_height = int(shape_size * math.sqrt(3) / 2)
 inner_tri_height = int(tri_height / 2)
 inner_tri_width = int(tri_height / math.sqrt(3))
 
+# Şekil listesi
 shapes = []
 
 class Shape:
@@ -55,6 +59,7 @@ class Shape:
                 rotated_triangle.append((x_rotated, y_rotated))
             pygame.draw.polygon(screen, self.color, rotated_triangle)
 
+# Şekil örnekleri oluştur
 shapes.append(Shape(100, 300, "triangle", red))  # Kırmızı üçgen
 shapes.append(Shape(220, 300, "triangle", green, scale=enlarged_scale))  # %50 büyütülmüş yeşil üçgen
 shapes.append(Shape(340, 300, "triangle", blue, scale=enlarged_blue_scale))  # %25 büyütülmüş mavi üçgen
@@ -63,13 +68,14 @@ shapes.append(Shape(580, 300, "triangle", green, scale=enlarged_scale))  # %50 b
 shapes.append(Shape(700, 300, "triangle", red))  # Kırmızı üçgen
 shapes.append(Shape(880, 300, "parallelogram", yellow))
 
-font = pygame.font.Font(None, 72)  # Font boyutu belirle
-text_surface = font.render("Kriptarium Tangram", True, (0, 0, 0))  # Yazıyı oluştur
-text_rect = text_surface.get_rect(midtop=(screen_width // 2, 10))  # Yazıyı en üstte ortala
+# Yazı ve simge ayarları
+font = pygame.font.Font(None, 72)
+text_surface = font.render("Kriptarium Tangram", True, (0, 0, 0))
+text_rect = text_surface.get_rect(midtop=(screen_width // 2, 10))
+icon = pygame.image.load("kriptarium.jpg")
+icon = pygame.transform.scale(icon, (72, 72))
 
-icon = pygame.image.load("kriptarium.jpg")  # Simgeyi yükle
-icon = pygame.transform.scale(icon, (72, 72))  # Simgeyi 72x72 piksel boyutunda ayarla
-
+# Oyun döngüsü
 clock = pygame.time.Clock()
 
 running = True
@@ -104,14 +110,20 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 if selected_shape:
                     selected_shape.angle -= rotation_speed
+            elif event.key == pygame.K_q:  # 'q' tuşuna basarak çıkış
+                running = False
 
-    screen.fill((255, 255, 255))  # Arka planı temizle
+    screen.fill((255, 255, 255))
 
     for shape in shapes:
         shape.draw()
 
-    screen.blit(icon, (text_rect.right + 10, text_rect.centery - icon.get_height() // 2))  # Simgeyi ekranın yanına yerleştir
-    screen.blit(text_surface, text_rect.topleft)  # Yazıyı ekrana yerleştir
+    screen.blit(icon, (text_rect.right + 10, text_rect.centery - icon.get_height() // 2))
+    screen.blit(text_surface, text_rect.topleft)
+
+    # Çıkış butonunu göster
+    quit_text = font.render("Çıkış için 'q'", True, (0, 0, 0))
+    screen.blit(quit_text, (10, screen_height - quit_text.get_height() - 10))
 
     pygame.display.flip()
     clock.tick(60)
